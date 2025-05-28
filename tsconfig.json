@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",                        // Best performance in modern runtimes
+    "module": "CommonJS",                      // Compatible with Node.js
+    "lib": ["DOM", "ESNext"],                  // Needed for Playwright + browser APIs
+    "moduleResolution": "node",                // Required for resolving node_modules
+    "esModuleInterop": true,                   // Allow default imports from CommonJS
+    "resolveJsonModule": true,                 // Useful for config/data files
+    "strict": true,                            // Enable all strict type-checking
+    "types": ["@playwright/test"],             // Pull in Playwright's type declarations
+    "skipLibCheck": true,                      // Faster builds, ignore 3rd-party d.ts issues
+    "forceConsistentCasingInFileNames": true,  // Cross-platform case sensitivity
+    "outDir": "dist",                          // Optional: compiled output folder
+    "allowSyntheticDefaultImports": true       // For flexibility with legacy modules
+  },
+  "include": ["e2e/**/*", "global.d.ts"],
+  "exclude": ["node_modules", "dist"]
+}
