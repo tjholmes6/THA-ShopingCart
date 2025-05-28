@@ -1,94 +1,84 @@
 # 🧪 Shopping Cart Demo - Test Strategy
 
-This document outlines the testing strategy for the **Shopping Cart Demo Page**, including functional, boundary, accessibility, and performance testing. The purpose is to ensure all interactions behave as expected under both normal and edge-case conditions.
+This project contains an end-to-end test suite for a shopping cart demo application using **Playwright + TypeScript**. The suite covers functional flows, edge cases, UI validation, and outlines a strategy for performance testing.
 
 ---
 
 ## ✅ Overview
 
-A single-page demo application showcasing a shopping cart interface where users can adjust item quantities, remove products, and proceed to checkout. The goal is to verify accuracy, validation, performance, and resilience under load.
+This is a single-page shopping cart UI where users can:
+
+- Adjust item quantities
+- Remove items
+- Proceed to checkout (with restrictions)
+- View item-specific indicators (e.g. promo, limited stock, out of stock)
+
+Test coverage focuses on verifying that all interactions behave as expected and validating visual or behavioral indicators for each item in the cart.
 
 ---
-# Playwright E2E Test Suite
 
-This project contains end-to-end tests for a shopping cart application using Playwright and TypeScript.
+## 🚀 Getting Started
 
-## Prerequisites
+### Prerequisites
+
 - Node.js 16+
 - npm 8+
 
-## Installation
-1. Clone the repository
-2. Install dependencies:
+### Setup
+
 ```bash
+git clone https://github.com/tjholmes6/THA-ShopingCart
+cd THA-ShopingCart
 npm install
 ```
-
-## Runing tests
-To run the test you just enter this command
+### Running Tests
 ```bash
-npm test
+npm test           # Run all tests
+npm run test:report  # View interactive HTML report
 ```
-To view the report
-```bash
-npm run test:report
-```
-## 🧪 Test Cases
 
-### Functional Test Cases
+## 🧪 Functional Test Cases
+| ID     | Scenario                           | Expected Result                                       |
+| ------ | ---------------------------------- | ----------------------------------------------------- |
+| TC-001 | Click "Checkout"                   | Should transition to the payment page (Not validated) |
+| TC-002 | Change quantity of item            | Cart total updates correctly                          |
+| TC-003 | Remove item from cart              | Item removed, total updates                           |
+| TC-004 | Promo item expires (mocked)        | Promo item removed, total updates                     |
+| TC-005 | Enter negative quantity            | Quantity resets to 1, validation shown                |
+| TC-006 | Promo timer is visible             | Promo timer appears for eligible items                |
+| TC-007 | Limited stock icon visible         | Icon appears on limited stock item                    |
+| TC-008 | Out-of-stock item affects checkout | Row is styled, checkout is disabled                   |
 
-| ID     | Scenario                                           | Steps                                                                 | Expected Result                                                     |
-|--------|----------------------------------------------------|-----------------------------------------------------------------------|----------------------------------------------------------------------|
-| TC-001 | User clicks "Checkout"                             | Click on checkout button                                              | Redirects or loads payment page                                     |
-| TC-002 | User changes item quantity                         | Enter new quantity in input field (e.g. 3)                            | Cart total updates to reflect new quantity                          |
-| TC-003 | User removes an item                               | Click "remove" icon/button on an item                                | Item disappears from list, total recalculates                       |
-| TC-004 | Promo item expires automatically                   | Wait (mock) beyond promo expiration time                              | Promo item removed, total updates                                   |
-| TC-005 | User inputs negative quantity                      | Input `-3` in quantity field                                          | Validation error shown, value reset to `1`                          |
-| TC-006 | Verify Promo timer is displayed | Check that promo timer is there | For the promo timer to exist and count down
-| TC-007 | Verify Limited Stock Icon | Check that an item has the limited stock icon | A ! should appear to an item with limited stock
-| TC-008 | Verify out-of-stock status | Check that if an item is out of stock | Should show up red and not be able to checkout
----
+## 🧪 Edge Case Tests
+| ID     | Scenario                        | Expected Behavior              |
+| ------ | ------------------------------- | ------------------------------ |
+| EC-001 | Quantity set to 0               | Treated as invalid, reset to 1 |
+| EC-002 | Extremely large quantity        | UI should remain usable        |
+| EC-003 | Remove all items                | Show empty cart state          |
+| EC-004 | Use browser back after checkout | Should not re-submit purchase  |
 
+## 🧪 Automated Tests
+| ID     | Covered Scenario           | Test Implementation                                            |
+| ------ | -------------------------- | -------------------------------------------------------------- |
+| TC-002 | Update quantity            | `test('Check that total updates after adding 9 headphones')`   |
+| TC-003 | Remove out-of-stock item   | `test('Validate you can checkout after removing an OOS item')` |
+| TC-005 | Enter negative quantity    | `test('Check for negative quantity to be invalid')`            |
+| TC-006 | Promo timer for Headphones | `test('Bluetooth Headphones show promo timer')`                |
+| TC-007 | Limited stock for T-shirt  | `test('T-shirt shows limited stock icon')`                     |
+| TC-008 | Travel Mug is out of stock | `test('Travel Mug is marked as out of stock')`                 |
 
-### Edge Case & Validation Tests
+## ⚙️ Automation Notes
 
-| ID     | Scenario                           | Expected Behavior                       |
-|--------|------------------------------------|-----------------------------------------|
-| EC-001 | Enter 0 as quantity                | Treated as invalid, reset to 1          |
-| EC-002 | Enter large number (e.g. 9999)     | Cart updates, check for UI breaking     |
-| EC-003 | Remove all items                   | Cart should show empty state message    |
-| EC-004 | Use browser back after checkout    | Should not re-submit purchase           |
-
----
-
-### Automated Test Cases
-
-| ID     | Scenario                                      | Steps                                                                 | Expected Result                                                     | Covered by Test                                                                 |
-|--------|-----------------------------------------------|-----------------------------------------------------------------------|----------------------------------------------------------------------|---------------------------------------------------------------------------------|
-| TC-002 | User changes item quantity (valid)           | Set quantity of headphones to 10                                      | Cart total updates to $870.99                                       | `test('Check that total updates after adding 9 headphones')`                    |
-| TC-003 | User removes an item (out-of-stock)          | Remove all out-of-stock items in the cart                             | Checkout button becomes enabled                                     | `test('Validate you can checkout after removing an OOS item')`                  |
-| TC-005 | User inputs negative quantity                | Input `-10` in quantity field for headphones                          | Quantity resets to 1                                                | `test('Check for negative quantity to be invalid')`                             |
-| TC-006    | Verify promo timer visibility                | Check Headphones item in the cart                                     | Promo timer is visible                                              | `test('Bluetooth Headphones show promo timer')`                                 |
-| TC-007    | Verify limited stock indicator               | Check T-shirt item in the cart                                        | Limited stock icon is visible                                       | `test('T-shirt shows limited stock icon')`                                      |
-| TC-008    | Verify out-of-stock status                   | Check Travel Mug item in the cart                                     | Out-of-stock indicator is visible                                   | `test('Travel Mug is marked as out of stock')`                                  |
-## ⚙️ Automated Testing Notes
-
-**Promo Expiry Mocking Example** (Jest):
+Tests are written with Playwright using the Page Object Model (POM). Each cart item is represented as a type-safe object, and the test suite is backed by custom fixtures for consistent setup.
+Promo Expiry (Mocking Example)
 ```ts
 jest.useFakeTimers();
 promoManager.startTimer();
-jest.advanceTimersByTime(1000 * 60 * 15); // fast-forward 15 mins
+jest.advanceTimersByTime(1000 * 60 * 15);
 ```
-Tools Suggested:
+## ⚡ Performance Testing Strategy
 
-    🧪 Playwright – UI and interaction testing
-
-
-## ⚡ Performance & Load Testing
-
-### 📈 Client-Side Performance
-
-Use Lighthouse to measure:
+Client-Side (Lighthouse)
 
     Time to Interactive (TTI)
 
@@ -96,63 +86,54 @@ Use Lighthouse to measure:
 
     Total Blocking Time (TBT)
 
-    Bundle Size
+    Bundle size
 
-### 🧩 Server-Side Transaction Timing
+Server-Side
 
-Key Endpoints:
+    Benchmark key endpoints:
 
-    /api/cart/update
+        /api/cart/update
 
-    /api/checkout/initiate
+        /api/checkout/initiate
 
-    🎯 Expected Response Time: < 200ms under normal load
+    🎯 Expected Response Time: <200ms
 
-## 🔥 Load Testing Strategy
-Scenario: Simulated Peak Usage
+Load Testing
 
-    Use tools like k6, Artillery, Locust
+    Use tools like k6, Artillery, or Locust
 
-    Base on real sale-day usage if data is available
+    Simulate peak traffic based on sale-day usage
 
-Scenario: Static Scaling Test
+    Test both:
 
-    Run with fixed number of servers/agents
+        Scaled environment (cloud-autoscaling)
 
-    Gradually increase concurrent users
-
-    Monitor:
-
-        Response times
-
-        Memory/CPU
-
-        User experience degradation
-
-        Failure point
-
-    🧠 Insight: Helps identify scaling limits or bottlenecks before cloud auto-scaling compensates
+        Fixed-agent environment (to identify failure limits)
 
 ## ♿ Accessibility Testing
-
-Element |	Standard |	Tool(s)|
-|-------|------------|---------|
-Inputs & Buttons|	Proper ARIA roles & labels|	axe, Lighthouse
-Focus Handling	|Keyboard navigation support	|axe
-Visual Contrast |	Meets WCAG 2.1 AA contrast ratio |	Lighthouse
+| Element          | Standard                      | Tools                |
+| ---------------- | ----------------------------- | -------------------- |
+| Inputs & Buttons | ARIA roles and labels         | axe, Lighthouse |
+| Keyboard Focus   | Fully navigable with keyboard | axe             |
+| Color Contrast   | Meets WCAG 2.1 AA             | Lighthouse           |
 
 ## 🌍 Test Environments
+| Environment | Purpose                          |
+| ----------- | -------------------------------- |
+| local-dev   | Mock-enabled development testing |
+| qa          | End-to-end validation            |
+| perf        | Load and performance simulations |
 
-Environment |	Description |
-|-----------|----------|
-local-dev	| mock enabled testing 
-qa |	End-to-end functional testing
-perf |	Load and performance testing
+## 🧭 Future Improvements
 
-## 🧪 Future Improvements
+    Add CI/CD integration (e.g. GitHub Actions)
 
-    Integrate tests into CI/CD pipeline (e.g. GitHub Actions)
+    Snapshot diffing to catch visual regressions
 
-    Track regressions automatically with visual snapshots
+    Add dynamic quantity/randomized input testing
 
-    Collect real-world analytics on load times
+    Use money class for more precise total calculations
+
+Feel free to explore the repo and run the test suite. Feedback and improvements always welcome!
+
+– Timothy Holmes
